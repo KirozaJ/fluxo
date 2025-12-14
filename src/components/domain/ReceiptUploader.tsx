@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Button } from '../ui/Button';
-import { CameraIcon, Loader2Icon, UploadIcon, XIcon } from 'lucide-react';
+import { CameraIcon, Loader2Icon, XIcon } from 'lucide-react';
 import Tesseract from 'tesseract.js';
 
 interface ReceiptUploaderProps {
@@ -68,7 +68,7 @@ export const ReceiptUploader = ({ onScanComplete }: ReceiptUploaderProps) => {
             // Need to convert to YYYY-MM-DD for input
             if (!extractedData.date && dateMatchSlash) {
                 const [d, m, y] = dateMatchSlash[0].split('/');
-                extractedData.date = `${y}-${m}-${d}`;
+                extractedData.date = `${y} -${m} -${d} `;
             }
 
             // 3. Extract Description (First line or merchant name guess)

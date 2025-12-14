@@ -6,7 +6,6 @@ import { format } from 'date-fns';
 import { useSettingsStore } from '../../store/settingsStore';
 import { exchangeRateService } from '../../services/exchangeRates';
 import type { Transaction } from '../../services/transactions';
-import { parseLocalDate } from '../../lib/date';
 
 export const SubscriptionList = () => {
     const { data: transactions, isLoading } = useTransactions();
