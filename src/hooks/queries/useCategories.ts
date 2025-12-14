@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { categoryService, type CreateCategoryParams } from '../../services/categories';
+import { categoryService, type CreateCategoryInput } from '../../services/categories';
 
 export const useCategories = () => {
     return useQuery({
@@ -12,7 +12,7 @@ export const useCreateCategory = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (params: CreateCategoryParams) => categoryService.create(params),
+        mutationFn: (params: CreateCategoryInput) => categoryService.create(params),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['categories'] });
         },
