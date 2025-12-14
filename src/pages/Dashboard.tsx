@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { DashboardStats } from '../components/domain/DashboardStats';
 import { TransactionList } from '../components/domain/TransactionList';
 import { TransactionForm } from '../components/domain/TransactionForm';
@@ -6,14 +6,14 @@ import { CategoryManager } from '../components/domain/CategoryManager';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import { useLogout } from '../hooks/queries/useAuth';
-import { PlusIcon, TagsIcon, LogOutIcon, BitcoinIcon } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { PlusIcon, TagsIcon, LogOutIcon, SettingsIcon } from 'lucide-react';
 
 import { TransactionEditModal } from '../components/domain/TransactionEditModal';
+import { SettingsModal } from '../components/domain/SettingsModal';
+import { ThemeSwitcher } from '../components/ui/ThemeSwitcher';
 import { MonthPicker } from '../components/domain/MonthPicker';
 import { ExpenseChart } from '../components/domain/ExpenseChart';
 import { CashFlowChart } from '../components/domain/CashFlowChart';
-import { BinanceConnectModal } from '../components/integrations/BinanceConnectModal';
 import type { Transaction } from '../services/transactions';
 
 export default function Dashboard() {
@@ -22,75 +22,12 @@ export default function Dashboard() {
 
     const [showTransactionForm, setShowTransactionForm] = useState(false);
     const [showCategoryManager, setShowCategoryManager] = useState(false);
-    const [showBinanceModal, setShowBinanceModal] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
-    const [cryptoBalance, setCryptoBalance] = useState<number | null>(null);
-
-    const fetchCryptoBalance = async () => {
-        try {
-            const { data, error } = await supabase.functions.invoke('connect-binance', {
-                body: { action: 'fetch' }
-            });
-            if (error) {
-                console.error('Edge Function Error:', error);
-                let errorMessage = 'Failed to fetch data from Binance (Edge Function Error).';
-                if (error instanceof Error) {
-                    errorMessage += ` ${error.message}`;
-                    // Attempt to assign context body if available
-                    try {
-                        // @ts-ignore
-                        if (error.context && typeof error.context.json === 'function') {
-                            // @ts-ignore
-                            const body = await error.context.json();
-                            if (body && body.error) errorMessage = `Binance Error: ${body.error}`;
-                        }
-                    } catch (ignore) { }
-                }
-                alert(errorMessage);
-                return;
-            }
-
-            if (data) {
-                console.log('Binance Data Received:', data);
-                if (data.error) {
-                    alert(`Binance Error: ${data.error}`);
-                    return;
-                }
-
-                const hasBalances = data.balances && data.balances.length > 0;
-                if (hasBalances) {
-                    setCryptoBalance(1234.56);
-                    // alert('Successfully fetched Binance data! Balance updated.'); // Optional: Uncomment for noisy success
-                } else {
-                    alert('Connected to Binance, but no balances found or invalid data format.');
-                }
-            }
-        } catch (e: any) {
-            console.error('Failed to fetch crypto', e);
-
-            let message = e.message || 'Unknown error occurred';
-            try {
-                if (e.context && typeof e.context.json === 'function') {
-                    const body = await e.context.json();
-                    if (body && body.error) {
-                        message = body.error;
-                    }
-                }
-            } catch (jsonError) {
-                // Failed to parse body
-            }
-
-            alert(`Complete Error Details: ${message}`);
-        }
-    };
-
-    useEffect(() => {
-        // Attempt to fetch on load
-        fetchCryptoBalance();
-    }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
+            {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
             {editingTransaction && (
                 <TransactionEditModal
                     transaction={editingTransaction}
@@ -98,28 +35,20 @@ export default function Dashboard() {
                 />
             )}
 
-            {showBinanceModal && (
-                <BinanceConnectModal
-                    onClose={() => setShowBinanceModal(false)}
-                    onSuccess={() => {
-                        fetchCryptoBalance();
-                    }}
-                />
-            )}
 
             {/* Header */}
-            <header className="bg-white shadow-sm sticky top-0 z-10">
+            <header className="bg-white/70 dark:bg-black/30 backdrop-blur-md border-b border-white/20 dark:border-white/10 sticky top-0 z-10 transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">F</div>
-                        <span className="text-xl font-bold text-gray-900">Fluxo</span>
+                        <img src="/logo.ico" alt="Fluxo" className="w-10 h-10 rounded-xl drop-shadow-[0_0_8px_rgba(168,85,247,0.5)] dark:drop-shadow-[0_0_8px_rgba(139,92,246,0.6)] object-cover" />
+                        <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-indigo-600">Fluxo</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="sm" onClick={() => setShowBinanceModal(true)} className="hidden sm:flex">
-                            <BitcoinIcon className="h-4 w-4 mr-2 text-yellow-500" />
-                            Connect Binance
+                    <div className="flex items-center gap-2 md:gap-4">
+                        <ThemeSwitcher />
+                        <Button variant="ghost" size="icon" onClick={() => setShowSettings(true)} className="text-text-muted hover:text-text-main">
+                            <SettingsIcon className="w-5 h-5" />
                         </Button>
-                        <span className="text-sm text-gray-600 hidden md:inline">{user?.email}</span>
+                        <span className="text-sm text-text-muted hidden md:inline border-l pl-4 border-gray-300 dark:border-gray-700 h-6 flex items-center">{user?.email}</span>
                         <Button variant="ghost" size="sm" onClick={() => logout.mutate()}>
                             <LogOutIcon className="h-4 w-4 md:mr-2" />
                             <span className="hidden md:inline">Sign Out</span>
@@ -130,12 +59,12 @@ export default function Dashboard() {
 
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <h2 className="text-lg font-semibold text-gray-900">Overview</h2>
+                    <h2 className="text-lg font-semibold text-text-main">Overview</h2>
                     <MonthPicker />
                 </div>
 
                 {/* Stats Overview */}
-                <DashboardStats cryptoBalance={cryptoBalance} />
+                <DashboardStats />
 
                 {/* Charts Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -148,7 +77,7 @@ export default function Dashboard() {
                     {/* Left Column: Transactions List */}
                     <div className="lg:col-span-2 space-y-4">
                         <div className="flex justify-between items-center">
-                            <h2 className="text-lg font-semibold text-gray-900">Transactions</h2>
+                            <h2 className="text-lg font-semibold text-text-main">Transactions</h2>
                             <Button onClick={() => setShowTransactionForm(!showTransactionForm)}>
                                 <PlusIcon className="mr-2 h-4 w-4" /> Add New
                             </Button>
@@ -167,7 +96,7 @@ export default function Dashboard() {
                     {/* Right Column: Sidebar / Categories */}
                     <div className="space-y-6">
                         <div className="flex justify-between items-center">
-                            <h2 className="text-lg font-semibold text-gray-900">Categories</h2>
+                            <h2 className="text-lg font-semibold text-text-main">Categories</h2>
                             <Button variant="outline" size="sm" onClick={() => setShowCategoryManager(!showCategoryManager)}>
                                 <TagsIcon className="mr-2 h-4 w-4" /> Manage
                             </Button>
@@ -176,24 +105,16 @@ export default function Dashboard() {
                         {showCategoryManager ? (
                             <CategoryManager onClose={() => setShowCategoryManager(false)} />
                         ) : (
-                            <div className="bg-white p-6 rounded-xl border shadow-sm text-center">
-                                <p className="text-gray-500 mb-4">Organize your spending with categories.</p>
+                            <div className="bg-surface p-6 rounded-xl border border-white/20 dark:border-white/10 shadow-sm text-center">
+                                <p className="text-text-muted mb-4">Organize your spending with categories.</p>
                                 <Button variant="outline" onClick={() => setShowCategoryManager(true)}>
                                     Manage Categories
                                 </Button>
                             </div>
                         )}
-
-                        {/* Mobile Connect Button (Visible only on small screens) */}
-                        <div className="sm:hidden mt-4">
-                            <Button variant="secondary" className="w-full" onClick={() => setShowBinanceModal(true)}>
-                                <BitcoinIcon className="h-4 w-4 mr-2 text-yellow-500" />
-                                Connect Binance
-                            </Button>
-                        </div>
                     </div>
-                </div>
-            </main>
-        </div>
+                </div >
+            </main >
+        </div >
     );
 }

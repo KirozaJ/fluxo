@@ -28,7 +28,7 @@ export const ExpenseChart = () => {
                 <CardHeader>
                     <CardTitle>Expenses by Category</CardTitle>
                 </CardHeader>
-                <CardContent className="h-[300px] flex items-center justify-center text-gray-500">
+                <CardContent className="h-[300px] flex items-center justify-center text-text-muted">
                     No expense data for this period
                 </CardContent>
             </Card>

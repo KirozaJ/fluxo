@@ -33,7 +33,7 @@ export const CategoryManager = ({ onClose }: { onClose?: () => void }) => {
             <CardContent>
                 <form onSubmit={handleCreate} className="flex gap-2 mb-6">
                     <select
-                        className="h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="h-10 rounded-md border border-white/10 bg-background text-text-main px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         value={type}
                         onChange={e => setType(e.target.value as 'income' | 'expense')}
                     >
@@ -54,8 +54,8 @@ export const CategoryManager = ({ onClose }: { onClose?: () => void }) => {
 
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                     {isLoading ? <p>Loading...</p> : categories?.map(cat => (
-                        <div key={cat.id} className="flex justify-between items-center p-2 border rounded hover:bg-gray-50">
-                            <span className="flex items-center gap-2">
+                        <div key={cat.id} className="flex justify-between items-center p-2 border border-white/10 rounded hover:bg-secondary/10 transition-colors">
+                            <span className="flex items-center gap-2 text-text-main">
                                 <span className={`w-2 h-2 rounded-full ${cat.type === 'income' ? 'bg-green-500' : 'bg-red-500'}`} />
                                 {cat.name}
                             </span>
@@ -70,7 +70,7 @@ export const CategoryManager = ({ onClose }: { onClose?: () => void }) => {
                         </div>
                     ))}
                     {!isLoading && categories?.length === 0 && (
-                        <p className="text-sm text-gray-500 text-center">No categories yet.</p>
+                        <p className="text-sm text-text-muted text-center">No categories yet.</p>
                     )}
                 </div>
             </CardContent>

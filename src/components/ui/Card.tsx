@@ -6,15 +6,13 @@ function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-    ({ className, ...props }, ref) => (
-        <div
-            ref={ref}
-            className={cn("rounded-xl border bg-white text-gray-950 shadow-sm", className)}
-            {...props}
-        />
-    )
-);
+export const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
+    <div
+        ref={ref}
+        className={cn("rounded-2xl border border-white/20 bg-surface text-text-main shadow-lg dark:border-white/10 dark:shadow-none", className)}
+        {...props}
+    />
+))
 Card.displayName = "Card";
 
 export const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(

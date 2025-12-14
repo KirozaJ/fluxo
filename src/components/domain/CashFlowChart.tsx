@@ -54,8 +54,15 @@ export const CashFlowChart = () => {
                             <XAxis dataKey="displayDate" tick={{ fontSize: 12 }} />
                             <YAxis tick={{ fontSize: 12 }} />
                             <Tooltip
+                                cursor={{ fill: 'transparent' }}
                                 formatter={(value: number) => `$${value.toFixed(2)}`}
-                                labelStyle={{ color: 'black' }}
+                                contentStyle={{
+                                    backgroundColor: 'var(--color-surface)',
+                                    borderColor: 'var(--color-border)',
+                                    color: 'var(--color-text-main)',
+                                    borderRadius: '0.75rem',
+                                }}
+                                labelStyle={{ color: 'var(--color-text-muted)' }}
                             />
                             <Bar dataKey="income" fill="#22c55e" name="Income" radius={[4, 4, 0, 0]} />
                             <Bar dataKey="expense" fill="#ef4444" name="Expense" radius={[4, 4, 0, 0]} />

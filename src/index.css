@@ -1,6 +1,118 @@
 @import "tailwindcss";
 
 @theme {
-    --font-sans: "Inter", sans-serif;
-    --color-primary: #2563eb;
+    /* Fonts */
+    --font-sans: "Outfit", "Inter", sans-serif;
+
+    /* Color Palette - Pastel Purple & Premium White */
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-background: var(--background);
+    --color-surface: var(--surface);
+    --color-surface-foreground: var(--surface-foreground);
+
+    --color-text-main: var(--text-main);
+    --color-text-muted: var(--text-muted);
+
+    /* Semantic Colors - Softened */
+    --color-success: #34D399;
+    /* EMERALD-400 */
+    --color-error: #F87171;
+    /* RED-400 */
+
+    /* Radius */
+    --radius-xl: 1.5rem;
+    /* 24px */
+    --radius-2xl: 2rem;
+    /* 32px */
+    --radius-full: 9999px;
+}
+
+:root {
+    /* Base - Light Mode */
+    --background: #F5F3FF;
+    /* VIOLET-50 */
+    --surface: #FFFFFF;
+    --surface-foreground: #FFFFFF;
+
+    --primary: #A78BFA;
+    /* VIOLET-400 */
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #E9D5FF;
+    /* VIOLET-200 */
+    --secondary-foreground: #4C1D95;
+    /* VIOLET-900 */
+
+    --accent: #DDD6FE;
+    /* VIOLET-300 */
+    --accent-foreground: #5B21B6;
+    /* VIOLET-800 */
+
+    --text-main: #4C1D95;
+    /* VIOLET-900 */
+    --text-muted: #8B5CF6;
+    /* VIOLET-500 */
+}
+
+.dark {
+    /* Base - Dark Mode */
+    --background: #0F0720;
+    /* Deep Violet Black */
+    --surface: #1E1B2E;
+    /* Dark Violet Gray */
+    --surface-foreground: #2D2A42;
+
+    --primary: #8B5CF6;
+    /* VIOLET-500 (Slightly darker/richer for dark mode) */
+    --primary-foreground: #FFFFFF;
+
+    --secondary: #2E1065;
+    /* VIOLET-950 */
+    --secondary-foreground: #E9D5FF;
+    /* VIOLET-200 */
+
+    --accent: #4C1D95;
+    /* VIOLET-900 */
+    --accent-foreground: #DDD6FE;
+    /* VIOLET-300 */
+
+    --text-main: #F5F3FF;
+    /* VIOLET-50 */
+    --text-muted: #A78BFA;
+    /* VIOLET-400 */
+}
+
+/* Global Reset & Base Styles */
+body {
+    background-color: var(--color-background);
+    color: var(--color-text-main);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar Styling for Webkit */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-secondary);
+    border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary);
 }

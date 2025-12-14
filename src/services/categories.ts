@@ -25,9 +25,18 @@ export const categoryService = {
     },
 
     async create(params: CreateCategoryParams) {
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            throw new Error('User not authenticated');
+        }
+
         const { data, error } = await supabase
             .from('categories')
-            .insert(params)
+            .insert({
+                ...params,
+                user_id: user.id
+            })
             .select()
             .single();
 

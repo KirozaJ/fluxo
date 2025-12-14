@@ -49,9 +49,18 @@ export const transactionService = {
     },
 
     async create(params: CreateTransactionParams) {
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            throw new Error('User not authenticated');
+        }
+
         const { data, error } = await supabase
             .from('transactions')
-            .insert(params)
+            .insert({
+                ...params,
+                user_id: user.id
+            })
             .select()
             .single();
 

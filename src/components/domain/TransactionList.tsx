@@ -36,10 +36,10 @@ export const TransactionList = ({ onEdit }: TransactionListProps) => {
             <CardContent>
                 <div className="space-y-4">
                     {transactions.map((t) => (
-                        <div key={t.id} className="flex items-center justify-between p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition shadow-sm">
+                        <div key={t.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-background hover:bg-secondary/10 transition shadow-sm">
                             <div className="flex flex-col">
-                                <span className="font-medium text-gray-900">{t.description || 'Untitled Transaction'}</span>
-                                <span className="text-xs text-gray-500">{format(new Date(t.date), 'MMM d, yyyy')} • {t.categories?.name || 'Uncategorized'}</span>
+                                <span className="font-medium text-text-main">{t.description || 'Untitled Transaction'}</span>
+                                <span className="text-xs text-text-muted">{format(new Date(t.date), 'MMM d, yyyy')} • {t.categories?.name || 'Uncategorized'}</span>
                             </div>
                             <div className="flex items-center gap-4">
                                 <span className={`font-bold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>

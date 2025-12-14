@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useLogin } from '../hooks/queries/useAuth';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
+import { Card } from '../components/ui/Card';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -15,47 +16,49 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-            <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-                    <p className="text-gray-600 mt-2">Sign in to manage your finances</p>
+        <div className="min-h-screen flex items-center justify-center p-4 bg-background transition-colors duration-300">
+            <Card className="w-full max-w-md p-8 shadow-2xl shadow-purple-200/50 dark:shadow-purple-900/20 border-white/40 dark:border-white/10 bg-white/60 dark:bg-surface/60 backdrop-blur-xl">
+                <div className="flex justify-center mb-8">
+                    <img src="/logo.ico" alt="Fluxo" className="w-24 h-24 rounded-3xl drop-shadow-[0_0_15px_rgba(168,85,247,0.5)] dark:drop-shadow-[0_0_15px_rgba(139,92,246,0.5)] object-cover" />
                 </div>
-
+                <h2 className="text-2xl font-bold text-center text-[var(--color-text-main)] mb-8">Welcome Back</h2>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     <Input
                         label="Email"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
+                        placeholder="your@email.com"
                         required
-                        placeholder="you@example.com"
                     />
                     <Input
                         label="Password"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
                         placeholder="••••••••"
+                        required
                     />
-
+                    {loginMutation.isError && (
+                        <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm">
+                            {loginMutation.error?.message || 'Failed to login'}
+                        </div>
+                    )}
                     <Button
                         type="submit"
-                        className="w-full"
+                        className="w-full h-12 text-lg shadow-purple-300/50"
                         isLoading={loginMutation.isPending}
                     >
                         Sign In
                     </Button>
                 </form>
-
-                <div className="mt-6 text-center text-sm text-gray-600">
+                <div className="mt-6 text-center text-sm text-gray-500">
                     Don't have an account?{' '}
-                    <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+                    <Link to="/register" className="font-semibold text-[var(--color-primary)] hover:text-purple-700">
                         Sign up
                     </Link>
                 </div>
-            </div>
+            </Card>
         </div>
     );
 }
