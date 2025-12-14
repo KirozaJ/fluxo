@@ -8,12 +8,16 @@ export interface Transaction {
     date: string;
     category_id: string | null;
     type: 'income' | 'expense';
+    is_recurring?: boolean;
+    recurring_day?: number;
     created_at: string;
     // Joined fields
     categories?: {
         name: string;
     } | null;
 }
+
+export type TransactionInput = Omit<Transaction, 'id' | 'created_at' | 'user_id' | 'categories'>;
 
 export interface CreateTransactionParams {
     amount: number;

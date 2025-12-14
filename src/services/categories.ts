@@ -2,15 +2,16 @@ import { supabase } from '../lib/supabase';
 
 export interface Category {
     id: string;
-    user_id: string;
     name: string;
     type: 'income' | 'expense';
+    monthly_limit?: number;
     created_at: string;
 }
 
-export interface CreateCategoryParams {
+export interface CreateCategoryInput {
     name: string;
     type: 'income' | 'expense';
+    monthly_limit?: number;
 }
 
 export const categoryService = {
@@ -24,7 +25,7 @@ export const categoryService = {
         return data as Category[];
     },
 
-    async create(params: CreateCategoryParams) {
+    async create(params: CreateCategoryInput) {
         const { data: { user } } = await supabase.auth.getUser();
 
         if (!user) {

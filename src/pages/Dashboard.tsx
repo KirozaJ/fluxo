@@ -3,6 +3,8 @@ import { DashboardStats } from '../components/domain/DashboardStats';
 import { TransactionList } from '../components/domain/TransactionList';
 import { TransactionForm } from '../components/domain/TransactionForm';
 import { CategoryManager } from '../components/domain/CategoryManager';
+import { BudgetProgress } from '../components/domain/BudgetProgress';
+import { SubscriptionList } from '../components/domain/SubscriptionList';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import { useLogout } from '../hooks/queries/useAuth';
@@ -95,6 +97,9 @@ export default function Dashboard() {
 
                     {/* Right Column: Sidebar / Categories */}
                     <div className="space-y-6">
+                        <BudgetProgress />
+                        <SubscriptionList />
+
                         <div className="flex justify-between items-center">
                             <h2 className="text-lg font-semibold text-text-main">Categories</h2>
                             <Button variant="outline" size="sm" onClick={() => setShowCategoryManager(!showCategoryManager)}>

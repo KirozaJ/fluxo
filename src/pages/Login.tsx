@@ -5,13 +5,34 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card } from '../components/ui/Card';
 
+import { z } from 'zod';
+
+const loginSchema = z.object({
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const loginMutation = useLogin();
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        const result = loginSchema.safeParse({ email, password });
+
+        if (!result.success) {
+            const newErrors: Record<string, string> = {};
+            result.error.issues.forEach(issue => {
+                newErrors[issue.path[0] as string] = issue.message;
+            });
+            setErrors(newErrors);
+            return;
+        }
+
+        setErrors({});
         loginMutation.mutate({ email, password });
     };
 
@@ -27,17 +48,25 @@ export default function Login() {
                         label="Email"
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                            setEmail(e.target.value);
+                            if (errors.email) setErrors({ ...errors, email: '' });
+                        }}
                         placeholder="your@email.com"
                         required
+                        error={errors.email}
                     />
                     <Input
                         label="Password"
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                            if (errors.password) setErrors({ ...errors, password: '' });
+                        }}
                         placeholder="••••••••"
                         required
+                        error={errors.password}
                     />
                     {loginMutation.isError && (
                         <div className="p-3 rounded-lg bg-red-50 text-red-600 text-sm">
