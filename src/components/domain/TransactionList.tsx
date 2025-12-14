@@ -3,8 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { format } from 'date-fns';
 import { Trash2Icon } from 'lucide-react';
 import { Button } from '../ui/Button';
+import type { Transaction } from '../../services/transactions';
 
-export const TransactionList = () => {
+interface TransactionListProps {
+    onEdit?: (transaction: Transaction) => void;
+}
+
+export const TransactionList = ({ onEdit }: TransactionListProps) => {
     const { data: transactions, isLoading } = useTransactions();
     const deleteMutation = useDeleteTransaction();
 
@@ -40,6 +45,14 @@ export const TransactionList = () => {
                                 <span className={`font-bold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                                     {t.type === 'income' ? '+' : '-'}${Number(t.amount).toFixed(2)}
                                 </span>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-gray-400 hover:text-blue-500"
+                                    onClick={() => onEdit && onEdit(t)}
+                                >
+                                    Edit
+                                </Button>
                                 <Button
                                     variant="ghost"
                                     size="sm"

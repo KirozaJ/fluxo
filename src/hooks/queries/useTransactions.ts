@@ -1,10 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { transactionService, type CreateTransactionParams, type UpdateTransactionParams } from '../../services/transactions';
 
+import { useDashboardStore } from '../../store/dashboardStore';
+
 export const useTransactions = () => {
+    const { getDateRange } = useDashboardStore();
+    const { startDate, endDate } = getDateRange();
+
     return useQuery({
-        queryKey: ['transactions'],
-        queryFn: transactionService.getAll,
+        queryKey: ['transactions', startDate, endDate],
+        queryFn: () => transactionService.getAll(startDate, endDate),
     });
 };
 

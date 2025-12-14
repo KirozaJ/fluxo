@@ -28,8 +28,8 @@ export interface UpdateTransactionParams extends Partial<CreateTransactionParams
 }
 
 export const transactionService = {
-    async getAll() {
-        const { data, error } = await supabase
+    async getAll(startDate?: string, endDate?: string) {
+        let query = supabase
             .from('transactions')
             .select(`
         *,
@@ -39,6 +39,11 @@ export const transactionService = {
       `)
             .order('date', { ascending: false });
 
+        if (startDate && endDate) {
+            query = query.gte('date', startDate).lte('date', endDate);
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
         return data as Transaction[];
     },
