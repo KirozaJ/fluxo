@@ -4,6 +4,7 @@ import { format } from 'date-fns';
 import { Trash2Icon } from 'lucide-react';
 import { Button } from '../ui/Button';
 import type { Transaction } from '../../services/transactions';
+import { parseLocalDate } from '../../lib/date';
 
 interface TransactionListProps {
     onEdit?: (transaction: Transaction) => void;
@@ -39,11 +40,16 @@ export const TransactionList = ({ onEdit }: TransactionListProps) => {
                         <div key={t.id} className="flex items-center justify-between p-4 border border-white/10 rounded-lg bg-background hover:bg-secondary/10 transition shadow-sm">
                             <div className="flex flex-col">
                                 <span className="font-medium text-text-main">{t.description || 'Untitled Transaction'}</span>
-                                <span className="text-xs text-text-muted">{format(new Date(t.date), 'MMM d, yyyy')} • {t.categories?.name || 'Uncategorized'}</span>
+                                <span className="text-xs text-text-muted">{format(parseLocalDate(t.date), 'MMM d, yyyy')} • {t.categories?.name || 'Uncategorized'}</span>
                             </div>
                             <div className="flex items-center gap-4">
                                 <span className={`font-bold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                                    {t.type === 'income' ? '+' : '-'}${Number(t.amount).toFixed(2)}
+                                    {t.type === 'income' ? '+' : '-'}
+                                    {new Intl.NumberFormat(undefined, {
+                                        style: 'currency',
+                                        currency: t.currency || 'USD',
+                                        currencyDisplay: 'symbol',
+                                    }).format(Number(t.amount))}
                                 </span>
                                 <Button
                                     variant="ghost"

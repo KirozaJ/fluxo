@@ -1,14 +1,40 @@
+import { useState, useEffect } from 'react';
 import { useTransactions } from '../../hooks/queries/useTransactions';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
+import { useSettingsStore } from '../../store/settingsStore';
+import { exchangeRateService } from '../../services/exchangeRates';
+import { parseLocalDate } from '../../lib/date';
 
 export const CashFlowChart = () => {
     const { data: transactions } = useTransactions();
+    const { baseCurrency } = useSettingsStore();
+    const [rates, setRates] = useState<Record<string, number>>({});
+
+    useEffect(() => {
+        const fetchRates = async () => {
+            try {
+                const fetchedRates = await exchangeRateService.getRates(baseCurrency.toLowerCase());
+                setRates(fetchedRates);
+            } catch (error) {
+                console.error("Failed to load rates", error);
+            }
+        };
+        fetchRates();
+    }, [baseCurrency]);
+
+    const convert = (amount: number, currency: string = 'USD') => {
+        if (currency === baseCurrency) return amount;
+
+        const rate = rates[currency] || rates[currency.toUpperCase()];
+        if (rate) return amount * rate;
+
+        if (currency.toUpperCase() === 'USD' && baseCurrency === 'USD') return amount;
+        return amount; // Fallback
+    };
 
     // Aggregate by Date
-    // We want to show a daily bar chart for the month
-
     const dataMap = new Map<string, { date: string; income: number; expense: number }>();
 
     transactions?.forEach(t => {
@@ -17,15 +43,17 @@ export const CashFlowChart = () => {
             dataMap.set(dateKey, { date: dateKey, income: 0, expense: 0 });
         }
         const entry = dataMap.get(dateKey)!;
-        if (t.type === 'income') entry.income += Number(t.amount);
-        if (t.type === 'expense') entry.expense += Number(t.amount);
+        const convertedAmount = convert(Number(t.amount), t.currency || 'USD');
+
+        if (t.type === 'income') entry.income += convertedAmount;
+        if (t.type === 'expense') entry.expense += convertedAmount;
     });
 
     const data = Array.from(dataMap.values())
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .sort((a, b) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime())
         .map(d => ({
             ...d,
-            displayDate: format(parseISO(d.date), 'dd MMM')
+            displayDate: format(parseLocalDate(d.date), 'dd MMM')
         }));
 
     if (data.length === 0) {
@@ -41,6 +69,18 @@ export const CashFlowChart = () => {
         );
     }
 
+    const formatCurrency = (value: number) => {
+        try {
+            return new Intl.NumberFormat(undefined, {
+                style: 'currency',
+                currency: baseCurrency,
+                currencyDisplay: 'symbol',
+            }).format(value);
+        } catch {
+            return `${baseCurrency} ${value.toFixed(2)}`;
+        }
+    };
+
     return (
         <Card className="h-full">
             <CardHeader>
@@ -55,7 +95,7 @@ export const CashFlowChart = () => {
                             <YAxis tick={{ fontSize: 12 }} />
                             <Tooltip
                                 cursor={{ fill: 'transparent' }}
-                                formatter={(value: number) => `$${value.toFixed(2)}`}
+                                formatter={(value: number) => formatCurrency(value)}
                                 contentStyle={{
                                     backgroundColor: 'var(--color-surface)',
                                     borderColor: 'var(--color-border)',

@@ -1,18 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuthStore } from '../../store/authStore';
 import { useTheme } from '../../hooks/useTheme';
-import { XIcon, SmartphoneIcon, UserIcon, InfoIcon, MonitorIcon } from 'lucide-react';
+import { useSettingsStore } from '../../store/settingsStore';
+import { XIcon, SmartphoneIcon, UserIcon, InfoIcon, MonitorIcon, SettingsIcon } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { Select } from '../ui/Select';
 
 interface SettingsModalProps {
     onClose: () => void;
 }
 
-type Tab = 'account' | 'appearance' | 'about';
+type Tab = 'account' | 'appearance' | 'preferences' | 'about';
 
 export function SettingsModal({ onClose }: SettingsModalProps) {
     const { user } = useAuthStore();
     const { theme, setTheme } = useTheme();
+    const { baseCurrency, setBaseCurrency } = useSettingsStore();
     const [activeTab, setActiveTab] = useState<Tab>('account');
     const modalRef = useRef<HTMLDivElement>(null);
 
@@ -48,6 +51,12 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                         className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium ${activeTab === 'appearance' ? 'bg-primary text-white shadow-md' : 'hover:bg-white/10'}`}
                     >
                         <SmartphoneIcon className="w-4 h-4" /> Appearance
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('preferences')}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium ${activeTab === 'preferences' ? 'bg-primary text-white shadow-md' : 'hover:bg-white/10'}`}
+                    >
+                        <SettingsIcon className="w-4 h-4" /> Preferences
                     </button>
                     <button
                         onClick={() => setActiveTab('about')}
@@ -122,6 +131,30 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
                                         <span className="text-sm font-medium block text-center">System</span>
                                         {theme === 'system' && <div className="absolute top-2 right-2 w-4 h-4 bg-primary rounded-full text-white flex items-center justify-center text-[10px]">✓</div>}
                                     </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'preferences' && (
+                        <div className="space-y-6">
+                            <div>
+                                <h3 className="text-lg font-semibold mb-2">Currency</h3>
+                                <p className="text-sm text-gray-500 mb-6">Set your primary currency for reporting.</p>
+                                <div className="max-w-xs">
+                                    <Select
+                                        label="Base Currency"
+                                        value={baseCurrency}
+                                        onChange={setBaseCurrency}
+                                        options={[
+                                            { value: 'USD', label: 'USD - United States Dollar' },
+                                            { value: 'EUR', label: 'EUR - Euro' },
+                                            { value: 'BRL', label: 'BRL - Brazilian Real' },
+                                            { value: 'GBP', label: 'GBP - British Pound' },
+                                            { value: 'BTC', label: 'BTC - Bitcoin' },
+                                            { value: 'ETH', label: 'ETH - Ethereum' },
+                                        ]}
+                                    />
                                 </div>
                             </div>
                         </div>

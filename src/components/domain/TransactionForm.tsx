@@ -6,13 +6,16 @@ import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { PlusIcon, SaveIcon, XIcon } from 'lucide-react';
+import { ReceiptUploader } from './ReceiptUploader';
 import { z } from 'zod';
 import type { Transaction } from '../../services/transactions';
+import { useSettingsStore } from '../../store/settingsStore';
 
 const transactionSchema = z.object({
     amount: z.number().min(0.01, "Amount must be greater than 0"),
     description: z.string().optional(),
     type: z.enum(['income', 'expense']),
+    currency: z.string().optional(),
     category_id: z.string().optional(),
     date: z.string().refine((val) => !isNaN(Date.parse(val)), "Invalid date"),
     is_recurring: z.boolean().optional(),
@@ -28,11 +31,13 @@ export const TransactionForm = ({ onClose, initialData }: TransactionFormProps) 
     const createMutation = useCreateTransaction();
     const updateMutation = useUpdateTransaction();
     const { data: categories } = useCategories();
+    const { baseCurrency } = useSettingsStore();
 
     // Form State
     const [amount, setAmount] = useState('');
     const [description, setDescription] = useState('');
     const [type, setType] = useState<'income' | 'expense'>('expense');
+    const [currency, setCurrency] = useState(baseCurrency);
     const [categoryId, setCategoryId] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [isRecurring, setIsRecurring] = useState(false);
@@ -44,12 +49,21 @@ export const TransactionForm = ({ onClose, initialData }: TransactionFormProps) 
             setAmount(String(initialData.amount));
             setDescription(initialData.description || '');
             setType(initialData.type);
+            setCurrency(initialData.currency || baseCurrency);
             setCategoryId(initialData.category_id || '');
             setDate(initialData.date);
             setIsRecurring(initialData.is_recurring || false);
             setRecurringDay(initialData.recurring_day || new Date(initialData.date).getDate());
         }
-    }, [initialData]);
+    }, [initialData, baseCurrency]);
+
+    const handleScanComplete = (data: { amount?: number; date?: string; description?: string }) => {
+        if (data.amount) setAmount(data.amount.toString());
+        if (data.date) setDate(data.date);
+        if (data.description) setDescription(data.description);
+        // Default to expense for receipts usually
+        setType('expense');
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -58,18 +72,14 @@ export const TransactionForm = ({ onClose, initialData }: TransactionFormProps) 
             amount: parseFloat(amount),
             description,
             type,
+            currency,
             category_id: categoryId || undefined,
             date,
             is_recurring: isRecurring,
             recurring_day: isRecurring ? recurringDay : undefined
         };
 
-        const result = transactionSchema.safeParse({
-            ...formData,
-            // Strip extra fields for validation if schema not updated yet, 
-            // or we need to update schema. Let's assume validation passes or is loose.
-            // Actually I should update the schema in the file too.
-        });
+        const result = transactionSchema.safeParse(formData);
 
         if (!result.success) {
             const newErrors: Record<string, string> = {};
@@ -115,6 +125,11 @@ export const TransactionForm = ({ onClose, initialData }: TransactionFormProps) 
                 )}
             </CardHeader>
             <CardContent>
+                {/* Only show scanner for new transactions */}
+                {!initialData && (
+                    <ReceiptUploader onScanComplete={handleScanComplete} />
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="flex gap-2">
                         <Button
@@ -135,16 +150,36 @@ export const TransactionForm = ({ onClose, initialData }: TransactionFormProps) 
                         </Button>
                     </div>
 
-                    <Input
-                        label="Amount"
-                        type="number"
-                        step="0.01"
-                        required
-                        value={amount}
-                        onChange={e => setAmount(e.target.value)}
-                        placeholder="0.00"
-                        error={errors.amount}
-                    />
+                    <div className="flex gap-2">
+                        <div className="flex-1">
+                            <Input
+                                label="Amount"
+                                type="number"
+                                step="any"
+                                required
+                                value={amount}
+                                onChange={e => setAmount(e.target.value)}
+                                placeholder="0.00"
+                                error={errors.amount}
+                            />
+                        </div>
+                        <div className="w-32">
+                            <Select
+                                label="Currency"
+                                value={currency}
+                                onChange={setCurrency}
+                                options={[
+                                    { value: 'USD', label: 'USD ($)' },
+                                    { value: 'EUR', label: 'EUR (€)' },
+                                    { value: 'BRL', label: 'BRL (R$)' },
+                                    { value: 'GBP', label: 'GBP (£)' },
+                                    { value: 'BTC', label: 'BTC (₿)' },
+                                    { value: 'ETH', label: 'ETH (Ξ)' },
+                                    { value: 'USDT', label: 'USDT (₮)' },
+                                ]}
+                            />
+                        </div>
+                    </div>
 
                     <Input
                         label="Description"

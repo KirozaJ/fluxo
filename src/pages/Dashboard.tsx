@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DashboardStats } from '../components/domain/DashboardStats';
+import { ExportMenu } from '../components/domain/ExportMenu';
 import { TransactionList } from '../components/domain/TransactionList';
 import { TransactionForm } from '../components/domain/TransactionForm';
 import { CategoryManager } from '../components/domain/CategoryManager';
@@ -10,6 +11,7 @@ import { useAuthStore } from '../store/authStore';
 import { useLogout } from '../hooks/queries/useAuth';
 import { PlusIcon, TagsIcon, LogOutIcon, SettingsIcon } from 'lucide-react';
 
+import { SmartInsightCard } from '../components/domain/SmartInsightCard';
 import { TransactionEditModal } from '../components/domain/TransactionEditModal';
 import { SettingsModal } from '../components/domain/SettingsModal';
 import { ThemeSwitcher } from '../components/ui/ThemeSwitcher';
@@ -62,7 +64,10 @@ export default function Dashboard() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 className="text-lg font-semibold text-text-main">Overview</h2>
-                    <MonthPicker />
+                    <div className="flex gap-2">
+                        <ExportMenu />
+                        <MonthPicker />
+                    </div>
                 </div>
 
                 {/* Stats Overview */}
@@ -97,6 +102,7 @@ export default function Dashboard() {
 
                     {/* Right Column: Sidebar / Categories */}
                     <div className="space-y-6">
+                        <SmartInsightCard />
                         <BudgetProgress />
                         <SubscriptionList />
 

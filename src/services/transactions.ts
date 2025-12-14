@@ -8,6 +8,7 @@ export interface Transaction {
     date: string;
     category_id: string | null;
     type: 'income' | 'expense';
+    currency?: string;
     is_recurring?: boolean;
     recurring_day?: number;
     created_at: string;
@@ -25,6 +26,7 @@ export interface CreateTransactionParams {
     date: string;
     category_id?: string;
     type: 'income' | 'expense';
+    currency?: string;
 }
 
 export interface UpdateTransactionParams extends Partial<CreateTransactionParams> {
