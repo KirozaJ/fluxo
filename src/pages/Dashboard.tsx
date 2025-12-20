@@ -9,12 +9,15 @@ import { SubscriptionList } from '../components/domain/SubscriptionList';
 import { Button } from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
 import { useLogout } from '../hooks/queries/useAuth';
-import { PlusIcon, TagsIcon, LogOutIcon, SettingsIcon } from 'lucide-react';
+import { PlusIcon, LogOutIcon, SettingsIcon } from 'lucide-react';
 
 import { SmartInsightCard } from '../components/domain/SmartInsightCard';
 import { TransactionEditModal } from '../components/domain/TransactionEditModal';
 import { SettingsModal } from '../components/domain/SettingsModal';
 import { ThemeSwitcher } from '../components/ui/ThemeSwitcher';
+import { SavingsGoalsList } from '../components/domain/SavingsGoalsList';
+import { AccountsList } from '../components/domain/AccountsList';
+import { AIChatWidget } from '../components/domain/AIChatWidget';
 import { MonthPicker } from '../components/domain/MonthPicker';
 import { ExpenseChart } from '../components/domain/ExpenseChart';
 import { CashFlowChart } from '../components/domain/CashFlowChart';
@@ -30,7 +33,8 @@ export default function Dashboard() {
     const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
     return (
-        <div className="min-h-screen">
+        <div className="min-h-screen bg-[var(--color-background)] text-[var(--color-text-main)] transition-colors duration-300">
+            <AIChatWidget />
             {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
             {editingTransaction && (
                 <TransactionEditModal
@@ -81,12 +85,13 @@ export default function Dashboard() {
 
                 {/* Actions & Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Transactions List */}
-                    <div className="lg:col-span-2 space-y-4">
+                    {/* Left Column: Accounts & Transactions */}
+                    <div className="lg:col-span-2 space-y-6">
                         <div className="flex justify-between items-center">
                             <h2 className="text-lg font-semibold text-text-main">Transactions</h2>
                             <Button onClick={() => setShowTransactionForm(!showTransactionForm)}>
-                                <PlusIcon className="mr-2 h-4 w-4" /> Add New
+                                <PlusIcon className="h-5 w-5 mr-2" />
+                                Add Transaction
                             </Button>
                         </div>
 
@@ -97,35 +102,35 @@ export default function Dashboard() {
                             </div>
                         )}
 
-                        <TransactionList onEdit={setEditingTransaction} />
+                        {/* Accounts List at top of main area */}
+                        <AccountsList />
+
+                        <div className="space-y-6">
+                            <TransactionList onEdit={setEditingTransaction} />
+                        </div>
                     </div>
 
-                    {/* Right Column: Sidebar / Categories */}
+                    {/* Right Column: Insights, Budget, Subscriptions, Savings, Categories */}
                     <div className="space-y-6">
                         <SmartInsightCard />
                         <BudgetProgress />
                         <SubscriptionList />
+                        <SavingsGoalsList />
 
                         <div className="flex justify-between items-center">
                             <h2 className="text-lg font-semibold text-text-main">Categories</h2>
-                            <Button variant="outline" size="sm" onClick={() => setShowCategoryManager(!showCategoryManager)}>
-                                <TagsIcon className="mr-2 h-4 w-4" /> Manage
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowCategoryManager(true)}
+                            >
+                                Manage
                             </Button>
                         </div>
-
-                        {showCategoryManager ? (
-                            <CategoryManager onClose={() => setShowCategoryManager(false)} />
-                        ) : (
-                            <div className="bg-surface p-6 rounded-xl border border-white/20 dark:border-white/10 shadow-sm text-center">
-                                <p className="text-text-muted mb-4">Organize your spending with categories.</p>
-                                <Button variant="outline" onClick={() => setShowCategoryManager(true)}>
-                                    Manage Categories
-                                </Button>
-                            </div>
-                        )}
+                        {showCategoryManager && <CategoryManager onClose={() => setShowCategoryManager(false)} />}
                     </div>
-                </div >
-            </main >
-        </div >
+                </div>
+            </main>
+        </div>
     );
 }
